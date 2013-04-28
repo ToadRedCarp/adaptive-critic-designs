@@ -23,9 +23,9 @@ clear all
 close all
 
 mfilepath=fileparts(which(mfilename));
-addpath(fullfile(mfilepath,'../../ANN/'));
-addpath(fullfile(mfilepath,'../../Testbench/'));
-addpath(fullfile(mfilepath,'../../Cart_Pole_Lui/'));
+addpath(fullfile(mfilepath,'../Common/ANN'));
+addpath(fullfile(mfilepath,'../Common/Plant'));
+addpath(fullfile(mfilepath,'../Common/GUI'));
 
 % indices into state vector
 thetaIndex    = 1;
