@@ -47,7 +47,7 @@ SOFTWARE.
 
 ## <a name='Description'/> Description ([Back to Top](#Top))
 
-The software contained in this repository is a set of Actor Critic Designs 
+The software contained in this repository is a set of Adaptive Critic Designs 
 (ACDs) that are using reinforcement learning (RL) in order to solve the 
 standard cart-pole problem.  
 
