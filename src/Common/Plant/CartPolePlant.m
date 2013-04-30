@@ -20,8 +20,6 @@
 
 function nextState = CartPolePlant(currentState, action)
 
-%% Currently this implementation returns the opposite signs as Lui's plant.
-
     g    = -9.8;     %m/s^2
     m_c  = 1.0;      %kg mass of cart
     m    = 0.1;      %kg mass of pole
@@ -31,8 +29,6 @@ function nextState = CartPolePlant(currentState, action)
 
     tau = 0.02;      %time-step in seconds
 
-    %%TODO
-    % For some reason if force is +10 it doesn't work! Why?!
     FORCE_LIMIT = -10;
     
     force = sign(action)*FORCE_LIMIT;
