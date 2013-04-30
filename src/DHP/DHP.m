@@ -43,18 +43,26 @@ actor = BackpropNeuralNet(numStates, 16, 1);
 critic = BackpropNeuralNet(numStates, 20, numStates);
 cartPole = CartPoleGUI(0, 0);
 
-for trial = 1:100
+trials = 100;
+
+% max = 0.007;
+% min = 0.001;
+
+% learningRatesActor   = min:(max-min)/trials:max;
+% learningRatesCritic  = min:(max-min)/trials:max;
+actorEpochs          = 5;
+criticEpochs         = 5;
+
+for trial = 1:trials
 
     clear actions;
     clear stateVector;
     clear reinforcementSignal;
-    
-    learningRateActor   = 0.007;
-    learningRateCritic  = 0.005;
-    actorEpochs     = 5;
-    criticEpochs    = 5;
 
     trial
+    
+    learningRateActor = 0.007; %learningRatesActor(trial);
+    learningRateCritic = 0.005;%learningRatesCritic(trial);
     
     itFell = 0;
 

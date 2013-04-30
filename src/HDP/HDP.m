@@ -83,13 +83,13 @@ for trial = 1:100
         %Critic Training
         criticOutput = reinforcementSignal(timeStep) + discountRate * Jt1;
         criticInputs = mapminmax(stateVector(:, timeStep)')';
-        criticMse = critic.train(10, 0.001, criticInputs, criticOutput);
+        criticMse = critic.train(10, 0.007, criticInputs, criticOutput);
         
         %Actor Training
         [dEdX,tmp] = critic.dOfErrorWithRespectedToX(criticInputs, 0);
         dXdu = dNextState(5,:);
         actorCriticExpectedOutputs = 0;
-        actorMse = actor.trainWithSpecifiedError(10, 0.001, actorInput, dXdu*dEdX);
+        actorMse = actor.trainWithSpecifiedError(10, 0.005, actorInput, dXdu*dEdX);
 
         if (timeStep > 2000)
             fprintf('We are the champions, my friend!');

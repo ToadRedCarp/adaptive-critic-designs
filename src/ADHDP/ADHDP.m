@@ -32,7 +32,12 @@ thetaIndex    = 1;
 thetaDotIndex = 2;
 xIndex        = 3;
 xDotIndex     = 4;
-    
+
+learningRateActor   = 0.007;
+learningRateCritic  = 0.005;
+actorEpochs         = 10;
+criticEpochs        = 10;
+
 timeStep = 1;
 stateVector(:, timeStep) = [0; 0; 0; 0];
 [numStates, cols] = size(stateVector(:, timeStep));
@@ -78,11 +83,11 @@ for trial = 1:100
         
         %Critic Training
         criticOutput = reinforcementSignal(timeStep);
-        criticMse = critic.train(10, 0.001, criticInputs, criticOutput);
+        criticMse = critic.train(criticEpochs, learningRateCritic, criticInputs, criticOutput);
 
         %Actor Training
         actorCriticExpectedOutputs = 0;
-        actorMse = actor.trainActorWithCriticConnected(10, 0.001, actorInput, critic, actorCriticExpectedOutputs, 5, 5);
+        actorMse = actor.trainActorWithCriticConnected(actorEpochs, learningRateActor, actorInput, critic, actorCriticExpectedOutputs, 5, 5);
 
         if (timeStep > 2000)
             fprintf('We are the champions, my friend!');
