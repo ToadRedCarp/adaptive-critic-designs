@@ -50,6 +50,9 @@ max_theta   = 12;
 %turn on/ff simple/complex utility functions
 binary_reinforcement = 0;
 
+learningRateActor = 0.01; 
+learningRateCritic = 0.01;
+
 for trial = 1:100
 
     clear actions;
@@ -94,13 +97,13 @@ for trial = 1:100
         %Critic Training
         criticOutput = reinforcementSignal(timeStep) + discountRate * Jt1;
         criticInputs = mapminmax(stateVector(:, timeStep)')';
-        criticMse = critic.train(10, 0.01, criticInputs, criticOutput);
+        criticMse = critic.train(10, learningRateCritic, criticInputs, criticOutput);
         
         %Actor Training
-        [dEdX,tmp] = critic.dOfErrorWithRespectedToX(criticInputs, 0);
-        dXdu = dNextState(5,:);
         actorCriticExpectedOutputs = 0;
-        actorMse = actor.trainWithSpecifiedError(10, 0.01, actorInput, dXdu*dEdX);
+        [dEdX,tmp] = critic.dOfErrorWithRespectedToX(criticInputs, actorCriticExpectedOutputs);
+        dXdu = dNextState(5,:);
+        actorMse = actor.trainWithSpecifiedError(10, learningRateActor, actorInput, dXdu*dEdX);
 
         if (timeStep > 2000)
             fprintf('We are the champions, my friend!');
@@ -114,7 +117,7 @@ for trial = 1:100
         timeStep = timeStep + 1;
     end
     
-    [row, numActions] = size(actions);
-    numActions
+    [row, numActions(trial)] = size(actions);
+    numActions(trial)
 end
 

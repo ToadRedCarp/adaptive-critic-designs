@@ -59,8 +59,8 @@ for trial = 1:trials
 
     trial
     
-    learningRateActor = 0.007; %learningRatesActor(trial);
-    learningRateCritic = 0.005;%learningRatesCritic(trial);
+    learningRateActor = 0.01; 
+    learningRateCritic = 0.01;
     
     itFell = 0;
 

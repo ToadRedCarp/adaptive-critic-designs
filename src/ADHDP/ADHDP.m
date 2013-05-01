@@ -33,8 +33,8 @@ thetaDotIndex = 2;
 xIndex        = 3;
 xDotIndex     = 4;
 
-learningRateActor   = 0.007;
-learningRateCritic  = 0.005;
+learningRateActor   = 0.01;
+learningRateCritic  = 0.01;
 actorEpochs         = 10;
 criticEpochs        = 10;
 
