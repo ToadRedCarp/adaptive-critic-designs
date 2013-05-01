@@ -44,6 +44,12 @@ actor = BackpropNeuralNet(numStates, 4, 1);
 critic = BackpropNeuralNet(numStates, 6, 1);
 cartPole = CartPoleGUI(0, 0);
 
+max_x       = 2.4;
+max_theta   = 12;
+
+%turn on/ff simple/complex utility functions
+binary_reinforcement = 0;
+
 for trial = 1:100
 
     clear actions;
@@ -73,8 +79,13 @@ for trial = 1:100
             ( stateVector(thetaIndex, timeStep) >= 12 || ...
               stateVector(thetaIndex, timeStep) <= -12  ) );
 
-        reinforcementSignal(timeStep) = itFell;
-
+        if (binary_reinforcement == 1)
+            reinforcementSignal(timeStep) = itFell;
+        else
+            maxR = (max_x)^5 + (max_theta)^2;
+            reinforcementSignal(timeStep) = (stateVector(xIndex, timeStep)^5 + stateVector(thetaIndex, timeStep)^2)/maxR;
+        end
+        
         stateVector(:, timeStep + 1) = CartPolePlant(stateVector(:, timeStep), actions(timeStep));
 
         %GUI Update
@@ -83,13 +94,13 @@ for trial = 1:100
         %Critic Training
         criticOutput = reinforcementSignal(timeStep) + discountRate * Jt1;
         criticInputs = mapminmax(stateVector(:, timeStep)')';
-        criticMse = critic.train(10, 0.007, criticInputs, criticOutput);
+        criticMse = critic.train(10, 0.01, criticInputs, criticOutput);
         
         %Actor Training
         [dEdX,tmp] = critic.dOfErrorWithRespectedToX(criticInputs, 0);
         dXdu = dNextState(5,:);
         actorCriticExpectedOutputs = 0;
-        actorMse = actor.trainWithSpecifiedError(10, 0.005, actorInput, dXdu*dEdX);
+        actorMse = actor.trainWithSpecifiedError(10, 0.01, actorInput, dXdu*dEdX);
 
         if (timeStep > 2000)
             fprintf('We are the champions, my friend!');

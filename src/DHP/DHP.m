@@ -43,13 +43,11 @@ actor = BackpropNeuralNet(numStates, 16, 1);
 critic = BackpropNeuralNet(numStates, 20, numStates);
 cartPole = CartPoleGUI(0, 0);
 
+%turn on/ff simple/complex utility functions
+binary_reinforcement = 0;
+
 trials = 100;
 
-% max = 0.007;
-% min = 0.001;
-
-% learningRatesActor   = min:(max-min)/trials:max;
-% learningRatesCritic  = min:(max-min)/trials:max;
 actorEpochs          = 5;
 criticEpochs         = 5;
 
@@ -85,8 +83,13 @@ for trial = 1:trials
         % Use model to get next state
         stateVector(:, timeStep + 1) = CartPolePlant(stateVector(:, timeStep), actions(timeStep));
       
-        %% Get partial derivatives        
-        dOfU_wrt_theta_and_x = DerivativeReinforcementSignalWithSigmoids(stateVector(thetaIndex, timeStep), stateVector(xIndex, timeStep));
+        %% Get partial derivatives
+        if (binary_reinforcement == 1)            
+            dOfU_wrt_theta_and_x = DerivativeReinforcementSignalWithSigmoids(stateVector(thetaIndex, timeStep), stateVector(xIndex, timeStep));
+        else
+            dOfU_wrt_theta_and_x = DerivativeReinforcementSignalWithExponentials(stateVector(thetaIndex, timeStep), stateVector(xIndex, timeStep));
+        end
+        
         dOfU_wrt_x = [dOfU_wrt_theta_and_x(1), 0, dOfU_wrt_theta_and_x(2), 0];
 
         dOfU_wrt_u = 0;
