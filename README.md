@@ -51,11 +51,15 @@ The software contained in this repository is a set of Adaptive Critic Designs
 (ACDs) that are using reinforcement learning (RL) in order to solve the 
 standard cart-pole problem.  
 
-Our implementations include:
+Our current implementations include:
  - HDP
  - ADHDP
  - DHP
+
+Future enhancements include:
  - ADDHP
+ - GDHP
+ - ADGDHP
 
 Enjoy!
 

@@ -1,4 +1,4 @@
-% Copyright (c) 2013 William Harding
+% Copyright (c) 2013 William Harding and Jonathan McCluskey.
 % 
 % Permission is hereby granted, free of charge, to any person obtaining 
 % a copy of this software and associated documentation files (the "Software"),
@@ -18,6 +18,14 @@
 % OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
 % SOFTWARE.
 
+
+% The "real" plant
+% @author William Harding <wpharding1@gmail.com>
+%
+% @param currentState, the current state (theta, theta_dot, x, x_dot)
+% @param action, the action to take
+% @return the true next state 
+%
 function nextState = CartPolePlant(currentState, action)
 
     g    = -9.8;     %m/s^2

@@ -1,4 +1,4 @@
-% Copyright (c) 2013 William Harding
+% Copyright (c) 2013 William Harding and Jonathan McCluskey.
 % 
 % Permission is hereby granted, free of charge, to any person obtaining 
 % a copy of this software and associated documentation files (the "Software"),
@@ -18,8 +18,8 @@
 % OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
 % SOFTWARE.
 
-%%William Harding
-%Neural Network using Backpropagation
+% Neural Network using Backpropagation
+% @author William Harding <wpharding1@gmail.com>
 
 classdef BackpropNeuralNet < handle
     properties (GetAccess=private)

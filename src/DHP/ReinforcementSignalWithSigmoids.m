@@ -1,4 +1,4 @@
-% Copyright (c) 2013 William Harding
+% Copyright (c) 2013 William Harding and Jonathan McCluskey.
 % 
 % Permission is hereby granted, free of charge, to any person obtaining 
 % a copy of this software and associated documentation files (the "Software"),
@@ -18,6 +18,13 @@
 % OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
 % SOFTWARE.
 
+% The Reinforcement Signal (i.e. how's the cart and pole really doing?)
+% @author William Harding <wpharding1@gmail.com>
+%
+% @param theta, the angle of the pole
+% @param x, the position of the cart
+% @return the reinforcement signal
+%
 function y=ReinforcementSignalWithSigmoids(theta, x)
    theta_max = 12;
    x_max     = 2.4;

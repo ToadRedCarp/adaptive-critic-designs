@@ -1,4 +1,4 @@
-% Copyright (c) 2013 Jonathan McCluskey
+% Copyright (c) 2013 William Harding and Jonathan McCluskey.
 % 
 % Permission is hereby granted, free of charge, to any person obtaining 
 % a copy of this software and associated documentation files (the "Software"),
@@ -18,6 +18,13 @@
 % OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
 % SOFTWARE.
 
+% The Model (which mimics the "real" plant)
+% @author Jonathan McCluskey <jonathan.m.mccluskey@gmail.com>
+% 
+% @param xt, the state of the system (theta, theta_dot, x, x_dot)
+% @param ft, the force (i.e. action) to take
+% @return xt1, the next state
+%
 function xt1=model(xt,ft)
 xt1=[0; 0; 0; 0];
 
