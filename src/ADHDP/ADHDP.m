@@ -88,8 +88,8 @@ for trial = 1:100
         if (binary_reinforcement == 1)
             reinforcementSignal(timeStep) = itFell;
         else
-            maxR = (max_x)^5 + (max_theta)^2;
-            reinforcementSignal(timeStep) = (stateVector(xIndex, timeStep)^5 + stateVector(thetaIndex, timeStep)^2)/maxR;
+            maxR = (max_x)^6 + (max_theta)^2;
+            reinforcementSignal(timeStep) = (stateVector(xIndex, timeStep)^6 + stateVector(thetaIndex, timeStep)^2)/maxR;
         end
         
         stateVector(:, timeStep + 1) = CartPolePlant(stateVector(:, timeStep), actions(timeStep));

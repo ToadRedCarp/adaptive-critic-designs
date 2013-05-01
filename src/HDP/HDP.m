@@ -53,8 +53,8 @@ max_theta   = 12;
 %turn on/ff simple/complex utility functions
 binary_reinforcement = 0;
 
-learningRateActor = 0.01; 
-learningRateCritic = 0.01;
+learningRateActor = 0.007; 
+learningRateCritic = 0.005;
 
 for trial = 1:100
 
@@ -88,8 +88,8 @@ for trial = 1:100
         if (binary_reinforcement == 1)
             reinforcementSignal(timeStep) = itFell;
         else
-            maxR = (max_x)^5 + (max_theta)^2;
-            reinforcementSignal(timeStep) = (stateVector(xIndex, timeStep)^5 + stateVector(thetaIndex, timeStep)^2)/maxR;
+            maxR = (max_x)^6 + (max_theta)^2;
+            reinforcementSignal(timeStep) = (stateVector(xIndex, timeStep)^6 + stateVector(thetaIndex, timeStep)^2)/maxR;
         end
         
         stateVector(:, timeStep + 1) = CartPolePlant(stateVector(:, timeStep), actions(timeStep));

@@ -35,11 +35,9 @@ function deriv=DerivativeReinforcementSignalWithExponentials(theta, x)
 %    syms y
 %    syms x
 %    syms theta
-   
-%    y = (theta^2 + x^5)/(theta_max^2 + x_max^5);
-   
-    deriv(1) = (5*x^4)/(5*x_max^4);
-    deriv(2) = (2*theta)/(2*theta_max);
-%    deriv(1) = (2*theta)/(theta_max^2 + x_max^5);
-%    deriv(2) = (5*x^4)/(theta_max^2 + x_max^5);
+%    
+%    y = (theta^2 + x^6)/(theta_max^2 + x_max^6);
+%    
+    deriv(1) = (2*theta)/(theta_max^2 + x_max^6);
+    deriv(2) = (6*x^5)/(theta_max^2 + x_max^6);
 end
