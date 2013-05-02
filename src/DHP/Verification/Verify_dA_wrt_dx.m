@@ -26,7 +26,7 @@ clear all
 close all
 
 mfilepath=fileparts(which(mfilename));
-addpath(fullfile(mfilepath,'../../../../ANN/'));
+addpath(fullfile(mfilepath,'../../common/ANN/'));
 
 % indices into state vector
 thetaIndex    = 1;
@@ -40,6 +40,7 @@ stateVector = [0; 0; 0; 0];
 actor = BackpropNeuralNet(numStates, 16, 1);
 
 stateVector = [0.1; 0.1; 0.1; 0.1];
+expectedStateVector = [0.2; 0.2; 0.2; 0.2];
 
 euclidianVector(:, thetaIndex)      = [1; 0; 0; 0];
 euclidianVector(:, thetaDotIndex)   = [0; 1; 0; 0];
@@ -49,6 +50,7 @@ epsilon = 0.001;
 
 % get next action
 actorInput = mapminmax(stateVector')';
+actorExpectedOutput = mapminmax(expectedStateVector')';
 
 dOfA_wrt_x = actor.dOfYWithRespectedToX(actorInput)
 
@@ -56,3 +58,22 @@ dOfA_wrt_x = actor.dOfYWithRespectedToX(actorInput)
 (actor.run(actorInput + epsilon*euclidianVector(:, thetaDotIndex)) - actor.run(actorInput - epsilon*euclidianVector(:, thetaDotIndex)))/(2*epsilon) 
 (actor.run(actorInput + epsilon*euclidianVector(:, xIndex)) - actor.run(actorInput - epsilon*euclidianVector(:, xIndex)))/(2*epsilon) 
 (actor.run(actorInput + epsilon*euclidianVector(:, xDotIndex)) - actor.run(actorInput - epsilon*euclidianVector(:, xDotIndex)))/(2*epsilon) 
+
+[dOfE_wrt_x, dummy] = actor.dOfErrorWithRespectedToX(actorInput, actorExpectedOutput);
+dOfE_wrt_x
+
+[dummy, errors1] = actor.dOfErrorWithRespectedToX(actorInput + epsilon*euclidianVector(:, thetaIndex), actorExpectedOutput + epsilon*euclidianVector(:, thetaIndex));
+[dummy, errors2] = actor.dOfErrorWithRespectedToX(actorInput - epsilon*euclidianVector(:, thetaIndex), actorExpectedOutput - epsilon*euclidianVector(:, thetaIndex));
+(errors1 - errors2)/(2*epsilon)
+
+[dummy, errors1] = actor.dOfErrorWithRespectedToX(actorInput + epsilon*euclidianVector(:, thetaDotIndex), actorExpectedOutput + epsilon*euclidianVector(:, thetaDotIndex));
+[dummy, errors2] = actor.dOfErrorWithRespectedToX(actorInput - epsilon*euclidianVector(:, thetaDotIndex), actorExpectedOutput - epsilon*euclidianVector(:, thetaDotIndex));
+(errors1 - errors2)/(2*epsilon)
+
+[dummy, errors1] = actor.dOfErrorWithRespectedToX(actorInput + epsilon*euclidianVector(:, xIndex), actorExpectedOutput + epsilon*euclidianVector(:, xIndex));
+[dummy, errors2] = actor.dOfErrorWithRespectedToX(actorInput - epsilon*euclidianVector(:, xIndex), actorExpectedOutput - epsilon*euclidianVector(:, xIndex));
+(errors1 - errors2)/(2*epsilon)
+
+[dummy, errors1] = actor.dOfErrorWithRespectedToX(actorInput + epsilon*euclidianVector(:, xDotIndex), actorExpectedOutput + epsilon*euclidianVector(:, xDotIndex));
+[dummy, errors2] = actor.dOfErrorWithRespectedToX(actorInput - epsilon*euclidianVector(:, xDotIndex), actorExpectedOutput - epsilon*euclidianVector(:, xDotIndex));
+(errors1 - errors2)/(2*epsilon)
