@@ -46,6 +46,8 @@ actor = BackpropNeuralNet(numStates, 16, 1);
 critic = BackpropNeuralNet(numStates, 20, numStates);
 cartPole = CartPoleGUI(0, 0);
 
+actor.setMomentum(1);
+
 %turn on/ff simple/complex utility functions
 binary_reinforcement = 0;
 
@@ -62,8 +64,8 @@ for trial = 1:trials
 
     trial
     
-    learningRateActor = 0.01; 
-    learningRateCritic = 0.01;
+    learningRateActor = 0.007; 
+    learningRateCritic = 0.005;
     
     itFell = 0;
 

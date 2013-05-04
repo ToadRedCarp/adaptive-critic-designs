@@ -31,6 +31,8 @@ classdef BackpropNeuralNet < handle
         OutputTransferFunction
 
         normalizeAtHiddenLayer
+        
+        momentum
     end
     
     properties
@@ -50,8 +52,8 @@ classdef BackpropNeuralNet < handle
            %initialize weights and biases
            obj.bias{1}        = 1;
            obj.bias{2}        = 1;
-           obj.weights{1}     = rand(numHiddenNodes, numInputNodes + 1);
-           obj.weights{2}     = rand(numOutputNodes, numHiddenNodes + 1);
+           obj.weights{1}     = (2*rand(numHiddenNodes, numInputNodes + 1) - 1)/10;
+           obj.weights{2}     = (2*rand(numOutputNodes, numHiddenNodes + 1) - 1)/10;
            obj.prevWeights{1} = zeros(numHiddenNodes, numInputNodes + 1);
            obj.prevWeights{2} = zeros(numOutputNodes, numHiddenNodes + 1);
            
@@ -59,8 +61,18 @@ classdef BackpropNeuralNet < handle
            obj.OutputTransferFunction = LinearFunction;
 
            obj.normalizeAtHiddenLayer = 0;
+           
+           obj.momentum = 1;
         end
 
+        function setMomentum(obj, momentum)
+            if (momentum <= 1 || momentum > 0)
+                obj.momentum = momentum;
+            else
+                fprintf('Momentum should be above 0 and not exceed 1');
+                obj.momentum = 1;
+            end
+        end
         
         function turnOnNormalizationAtHiddenLayer(obj)
             obj.normalizeAtHiddenLayer = 1;
@@ -108,19 +120,6 @@ classdef BackpropNeuralNet < handle
                 secondLayerOutputY = obj.OutputTransferFunction.TheFunction(secondLayerV);
             end
             outputs = secondLayerOutputY;
-%             [inputDataRows, inputDataCols] = size(inputs);
-%             
-%             inputsAndBias = [inputs; ones(1, inputDataCols)];
-%             
-%             firstLayerV = inputsAndBias' * obj.weights{1}';
-% 
-%             firstLayerOutputY = obj.HiddenTransferFunction.TheFunction(firstLayerV);
-% 
-%             secondLayerV = [firstLayerOutputY ones(inputDataCols, 1)] * obj.weights{2}';
-% 
-%             secondLayerOutputY = obj.OutputTransferFunction.TheFunction(secondLayerV);
-%             
-%             outputs = secondLayerOutputY;
         end
         
         %%dOfYWithRespectedToX
@@ -225,9 +224,9 @@ classdef BackpropNeuralNet < handle
                     obj.prevWeights = obj.weights;
 
                     % Update weights at second layer
-                    obj.weights{2} = obj.prevWeights{2} + eta*secondLayerDelta*[firstLayerOutputY obj.bias{2}];
+                    obj.weights{2} = obj.momentum*obj.prevWeights{2} + eta*secondLayerDelta*[firstLayerOutputY obj.bias{2}];
 
-                    obj.weights{1} = obj.prevWeights{1} + eta*firstLayerDelta'*firstLayerInput;
+                    obj.weights{1} = obj.momentum*obj.prevWeights{1} + eta*firstLayerDelta'*firstLayerInput;
                 end
 
                 mse(epoch) = sum(mean(error.^2));
@@ -270,9 +269,9 @@ classdef BackpropNeuralNet < handle
                     obj.prevWeights = obj.weights;
 
                     %% Update Weights
-                    obj.weights{2} = obj.prevWeights{2} + eta*secondLayerDelta*[firstLayerOutputY obj.bias{2}];
+                    obj.weights{2} = obj.momentum*obj.prevWeights{2} + eta*secondLayerDelta*[firstLayerOutputY obj.bias{2}];
 
-                    obj.weights{1} = obj.prevWeights{1} + eta*firstLayerDelta'*firstLayerInput;
+                    obj.weights{1} = obj.momentum*obj.prevWeights{1} + eta*firstLayerDelta'*firstLayerInput;
                 end
 
                 mse(epoch) = sum(mean(error.^2));
