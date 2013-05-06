@@ -29,6 +29,7 @@ mfilepath=fileparts(which(mfilename));
 addpath(fullfile(mfilepath,'../Common/ANN'));
 addpath(fullfile(mfilepath,'../Common/Plant'));
 addpath(fullfile(mfilepath,'../Common/GUI'));
+addpath(fullfile(mfilepath,'../HDP'));
 
 % indices into state vector
 thetaIndex    = 1;
@@ -40,10 +41,12 @@ timeStep = 1;
 stateVector(:, timeStep) = [0; 0; 0; 0];
 [numStates, cols] = size(stateVector(:, timeStep));
 
-discountRate = 1.0;
+discountRate = 0.9;
     
 actor = BackpropNeuralNet(numStates, 16, 1);
 critic = BackpropNeuralNet(numStates, 20, numStates);
+% actor.setHiddenTransferFunction(Logistic);
+% critic.setHiddenTransferFunction(Logistic);
 cartPole = CartPoleGUI(0, 0);
 
 actor.setMomentum(1);
@@ -53,8 +56,8 @@ binary_reinforcement = 0;
 
 trials = 100;
 
-actorEpochs          = 5;
-criticEpochs         = 5;
+actorEpochs          = 1;
+criticEpochs         = 1;
 
 for trial = 1:trials
 
@@ -62,10 +65,10 @@ for trial = 1:trials
     clear stateVector;
     clear reinforcementSignal;
 
-    trial
+%     trial
     
-    learningRateActor = 0.007; 
-    learningRateCritic = 0.005;
+    learningRateActor = 0.01; 
+    learningRateCritic = 0.0001;
     
     itFell = 0;
 
@@ -73,16 +76,16 @@ for trial = 1:trials
     stateVector(:, timeStep) = [0; 0; 0; 0];
     [numStates, cols] = size(stateVector(:, timeStep));
     
-    boostTheta      = 1;
-    boostTheta_dot  = 0.1;
-    boostX          = 1;
-    boostX_dot      = 0.1;
+    boostTheta      = 3/pi;
+    boostTheta_dot  = 3;
+    boostX          = 0.05; %0.16
+    boostX_dot      = 1;
     boostMatrix     = diag([boostTheta, boostTheta_dot, boostX, boostX_dot], 0);
     
     while (true)
-        
         % get next action
-        actorInput = mapminmax(stateVector(:, timeStep)')';
+        scaledState = boostMatrix*stateVector(:, timeStep);
+        actorInput = scaledState;
         actions(timeStep) = actor.run(actorInput);
         
         % Use model to get next state
@@ -90,9 +93,9 @@ for trial = 1:trials
       
         %% Get partial derivatives
         if (binary_reinforcement == 1)            
-            dOfU_wrt_theta_and_x = DerivativeReinforcementSignalWithSigmoids(stateVector(thetaIndex, timeStep), stateVector(xIndex, timeStep));
+            dOfU_wrt_theta_and_x = DerivativeReinforcementSignalWithSigmoids(scaledState(thetaIndex), scaledState(xIndex));
         else
-            dOfU_wrt_theta_and_x = DerivativeReinforcementSignalWithExponentials(stateVector(thetaIndex, timeStep), stateVector(xIndex, timeStep));
+            dOfU_wrt_theta_and_x = DerivativeReinforcementSignalWithExponentials(scaledState(thetaIndex), scaledState(xIndex));
         end
         
         dOfU_wrt_x = [dOfU_wrt_theta_and_x(1), 0, dOfU_wrt_theta_and_x(2), 0];
@@ -100,27 +103,31 @@ for trial = 1:trials
         dOfU_wrt_u = 0;
         
         [dOfF_wrt_x, dOfF_wrt_u] = CartPoleModelScriptDerivative(stateVector(:, timeStep), actions(timeStep));
-        
+
         dOfA_wrt_x = actor.dOfYWithRespectedToX(actorInput);
         
         %% Get G(t+1)
-        nextCriticInputs = mapminmax([stateVector(:, timeStep + 1)]')';
-        nextG=critic.run(nextCriticInputs)/boostMatrix;
+        nextG=critic.run(boostMatrix*stateVector(:, timeStep + 1))/boostMatrix;
+%         nextG=critic.run(boostMatrix*stateVector(:, timeStep + 1))*boostMatrix;
         
         criticExpectedOutput = dOfU_wrt_x' + (discountRate * dOfF_wrt_x' * nextG') + ...
-                               dOfA_wrt_x * (dOfU_wrt_u + discountRate * dOfF_wrt_u * nextG');   
+                               boostMatrix*dOfA_wrt_x * (dOfU_wrt_u + discountRate * dOfF_wrt_u * nextG');   %todo - multiple or divide by boost
                            
         %GUI Update
         cartPole.update(stateVector(thetaIndex, timeStep + 1) + 90, stateVector(xIndex, timeStep + 1));
         
         %Critic Training
-        criticInputs = mapminmax([stateVector(:, timeStep)]')';
-        criticOutput = boostMatrix*criticExpectedOutput;
-        criticMse = critic.train(criticEpochs, learningRateCritic, criticInputs, criticOutput);
-
-        %% Get G(t + 1) after critic trained
-        nextCriticInputs = mapminmax([stateVector(:, timeStep + 1)]')';
-        nextG=critic.run(nextCriticInputs)/boostMatrix;
+        criticInputs = (boostMatrix*stateVector(:, timeStep));
+        criticError = (criticExpectedOutput' - critic.run(criticInputs))/boostMatrix;
+        criticMse = critic.trainWithSpecifiedError(criticEpochs, learningRateCritic, criticInputs, criticError');
+        
+%         criticInputs = (stateVector(:, timeStep)'/boostMatrix)';
+%         criticOutput = (criticExpectedOutput'/boostMatrix)';
+%         criticMse = critic.train(criticEpochs, learningRateCritic, criticInputs, criticOutput);
+        
+        %% Get G(t+1)
+        nextG=critic.run(boostMatrix*stateVector(:, timeStep + 1))/boostMatrix;
+%         nextG=critic.run(boostMatrix*stateVector(:, timeStep + 1))*boostMatrix;
         
         %Actor Training
         actorError = (dOfU_wrt_u + discountRate * dOfF_wrt_u * nextG');
@@ -145,8 +152,14 @@ for trial = 1:trials
         timeStep = timeStep + 1;
     end
     
+    %Final Critic Training
+    criticInputs = (boostMatrix*stateVector(:, timeStep));
+    criticError = (dOfU_wrt_x - critic.run(criticInputs))/boostMatrix;
+    criticMse = critic.trainWithSpecifiedError(criticEpochs, learningRateCritic, criticInputs, criticError');
+        
+    
     [row, numActions(trial)] = size(actions);
-    numActions(trial)
+%     numActions(trial)
 end
 
 

@@ -117,8 +117,10 @@ classdef BackpropNeuralNet < handle
                 firstLayerOutputY = obj.HiddenTransferFunction.TheFunction(firstLayerV);
 
                 secondLayerV = [firstLayerOutputY obj.bias{2}] * obj.weights{2}';
+%                 secondLayerOutputY(:, input) = obj.OutputTransferFunction.TheFunction(secondLayerV);
                 secondLayerOutputY = obj.OutputTransferFunction.TheFunction(secondLayerV);
             end
+%             outputs = secondLayerOutputY';
             outputs = secondLayerOutputY;
         end
         
@@ -233,7 +235,52 @@ classdef BackpropNeuralNet < handle
             end 
         end
         
-        %%Neural Network Train Function
+%         
+%         %%Neural Network Train Function With Scaling Matrix
+%         % epochs         = max number of epochs
+%         % eta            = learning rate
+%         % inputs         = column vector of inputs
+%         % expectedOutput = column vector of expected outputs
+%         function mse=train(obj, epochs, eta, inputs, expectedOutput, scalingMatrix)
+%             
+%             [inputDataRows, inputDataCols] = size(inputs);
+%             
+%             for epoch = 1:1:epochs
+%                 for input = 1:1:inputDataCols
+% 
+%                     %%Forward Pass
+%                     firstLayerInput = [inputs(:, input)' obj.bias{1}];
+%                     firstLayerV = firstLayerInput * obj.weights{1}';
+%                     firstLayerOutputY = obj.HiddenTransferFunction.TheFunction(firstLayerV);
+%                     secondLayerV = [firstLayerOutputY obj.bias{2}] * obj.weights{2}';
+%                     secondLayerOutputY = obj.OutputTransferFunction.TheFunction(secondLayerV);
+% 
+%                     % find error
+%                     error(:, input) = (expectedOutput(:, input) - secondLayerOutputY')/scalingMatrix;
+% 
+%                     %% Backpropogation
+%                     % Output Layer
+%                     secondLayerDelta = error(:, input).*obj.OutputTransferFunction.TheDerivative(secondLayerV)';
+% 
+%                     %Hidden Layer
+%                     firstLayerDelta = (obj.HiddenTransferFunction.TheDerivative(firstLayerV)) .* ...
+%                                       ((obj.weights{2}(:, 1:obj.numHiddenNodes)'*secondLayerDelta))';
+%                                   
+% 
+%                     % Store the current weights
+%                     obj.prevWeights = obj.weights;
+% 
+%                     % Update weights at second layer
+%                     obj.weights{2} = obj.momentum*obj.prevWeights{2} + eta*secondLayerDelta*[firstLayerOutputY obj.bias{2}];
+% 
+%                     obj.weights{1} = obj.momentum*obj.prevWeights{1} + eta*firstLayerDelta'*firstLayerInput;
+%                 end
+% 
+%                 mse(epoch) = sum(mean(error.^2));
+%             end 
+%         end
+        
+        %%Neural Network Train
         % epochs         = max number of epochs
         % eta            = learning rate
         % inputs         = row vector of inputs
