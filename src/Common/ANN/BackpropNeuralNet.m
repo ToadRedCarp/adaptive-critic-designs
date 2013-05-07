@@ -351,9 +351,9 @@ classdef BackpropNeuralNet < handle
                     obj.prevWeights = obj.weights;
 
                     %% Update Weights
-                    obj.weights{2} = obj.prevWeights{2} + eta*secondLayerDelta*[firstLayerOutputY obj.bias{2}];
+                    obj.weights{2} = obj.momentum*obj.prevWeights{2} + eta*secondLayerDelta*[firstLayerOutputY obj.bias{2}];
 
-                    obj.weights{1} = obj.prevWeights{1} + eta*firstLayerDelta'*firstLayerInput;
+                    obj.weights{1} = obj.momentum*obj.prevWeights{1} + eta*firstLayerDelta'*firstLayerInput;
                 end
 
                 mse(epoch) = sum(mean(error.^2));

@@ -41,10 +41,10 @@ timeStep = 1;
 stateVector(:, timeStep) = [0; 0; 0; 0];
 [numStates, cols] = size(stateVector(:, timeStep));
 
-discountRate = 0.9;
+discountRate = 1;
     
-actor = BackpropNeuralNet(numStates, 16, 1);
-critic = BackpropNeuralNet(numStates, 20, numStates);
+actor = BackpropNeuralNet(numStates, 8, 1);
+critic = BackpropNeuralNet(numStates, 10, numStates);
 % actor.setHiddenTransferFunction(Logistic);
 % critic.setHiddenTransferFunction(Logistic);
 cartPole = CartPoleGUI(0, 0);
@@ -67,7 +67,7 @@ for trial = 1:trials
 
 %     trial
     
-    learningRateActor = 0.01; 
+    learningRateActor = 0.001; 
     learningRateCritic = 0.0001;
     
     itFell = 0;
@@ -76,9 +76,9 @@ for trial = 1:trials
     stateVector(:, timeStep) = [0; 0; 0; 0];
     [numStates, cols] = size(stateVector(:, timeStep));
     
-    boostTheta      = 3/pi;
+    boostTheta      = 0.85;
     boostTheta_dot  = 3;
-    boostX          = 0.05; %0.16
+    boostX          = 0.16;
     boostX_dot      = 1;
     boostMatrix     = diag([boostTheta, boostTheta_dot, boostX, boostX_dot], 0);
     
@@ -102,13 +102,13 @@ for trial = 1:trials
 
         dOfU_wrt_u = 0;
         
-        [dOfF_wrt_x, dOfF_wrt_u] = CartPoleModelScriptDerivative(stateVector(:, timeStep), actions(timeStep));
+        [dOfF_wrt_x, dOfF_wrt_u] = CartPoleModelScriptDerivative(scaledState, actions(timeStep));
 
         dOfA_wrt_x = actor.dOfYWithRespectedToX(actorInput);
         
         %% Get G(t+1)
-        nextG=critic.run(boostMatrix*stateVector(:, timeStep + 1))/boostMatrix;
-%         nextG=critic.run(boostMatrix*stateVector(:, timeStep + 1))*boostMatrix;
+%         nextG=critic.run(boostMatrix*stateVector(:, timeStep + 1))/boostMatrix;
+        nextG=critic.run(boostMatrix*stateVector(:, timeStep + 1))*boostMatrix;
         
         criticExpectedOutput = dOfU_wrt_x' + (discountRate * dOfF_wrt_x' * nextG') + ...
                                boostMatrix*dOfA_wrt_x * (dOfU_wrt_u + discountRate * dOfF_wrt_u * nextG');   %todo - multiple or divide by boost
@@ -121,16 +121,12 @@ for trial = 1:trials
         criticError = (criticExpectedOutput' - critic.run(criticInputs))/boostMatrix;
         criticMse = critic.trainWithSpecifiedError(criticEpochs, learningRateCritic, criticInputs, criticError');
         
-%         criticInputs = (stateVector(:, timeStep)'/boostMatrix)';
-%         criticOutput = (criticExpectedOutput'/boostMatrix)';
-%         criticMse = critic.train(criticEpochs, learningRateCritic, criticInputs, criticOutput);
-        
         %% Get G(t+1)
-        nextG=critic.run(boostMatrix*stateVector(:, timeStep + 1))/boostMatrix;
-%         nextG=critic.run(boostMatrix*stateVector(:, timeStep + 1))*boostMatrix;
+%         nextG=critic.run(boostMatrix*stateVector(:, timeStep + 1))/boostMatrix;
+        nextG=critic.run(boostMatrix*stateVector(:, timeStep + 1))*boostMatrix;
         
         %Actor Training
-        actorError = (dOfU_wrt_u + discountRate * dOfF_wrt_u * nextG');
+        actorError = (dOfU_wrt_u + discountRate * dOfF_wrt_u * nextG')
         actorMse = actor.trainWithSpecifiedError(actorEpochs, learningRateActor, actorInput, actorError);
 
         if (timeStep > 2000)
@@ -146,6 +142,7 @@ for trial = 1:trials
               stateVector(thetaIndex, timeStep) <= -12  ) );
         
         if (itFell == 1)
+            nextG
             break;
         end
 
