@@ -126,7 +126,7 @@ for trial = 1:trials
         nextG=critic.run(boostMatrix*stateVector(:, timeStep + 1))*boostMatrix;
         
         %Actor Training
-        actorError = (dOfU_wrt_u + discountRate * dOfF_wrt_u * nextG')
+        actorError = (dOfU_wrt_u + discountRate * dOfF_wrt_u * nextG');
         actorMse = actor.trainWithSpecifiedError(actorEpochs, learningRateActor, actorInput, actorError);
 
         if (timeStep > 2000)
@@ -141,12 +141,11 @@ for trial = 1:trials
             ( stateVector(thetaIndex, timeStep) >= 12 || ...
               stateVector(thetaIndex, timeStep) <= -12  ) );
         
+        timeStep = timeStep + 1;
+        
         if (itFell == 1)
-            nextG
             break;
         end
-
-        timeStep = timeStep + 1;
     end
     
     %Final Critic Training
