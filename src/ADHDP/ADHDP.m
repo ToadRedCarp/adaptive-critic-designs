@@ -40,14 +40,14 @@ xDotIndex     = 4;
 
 learningRateActor   = 0.01;
 learningRateCritic  = 0.01;
-actorEpochs         = 10;
-criticEpochs        = 10;
+actorEpochs         = 1;
+criticEpochs        = 1;
 
 timeStep = 1;
 stateVector(:, timeStep) = [0; 0; 0; 0];
 [numStates, cols] = size(stateVector(:, timeStep));
 
-discountRate = 0.9;
+discountRate = 1;
     
 actor = BackpropNeuralNet(numStates, 4, 1);
 critic = BackpropNeuralNet(numStates + 1, 6, 1);
@@ -88,8 +88,8 @@ for trial = 1:100
         if (binary_reinforcement == 1)
             reinforcementSignal(timeStep) = itFell;
         else
-            maxR = (max_x)^6 + (max_theta)^2;
-            reinforcementSignal(timeStep) = (stateVector(xIndex, timeStep)^6 + stateVector(thetaIndex, timeStep)^2)/maxR;
+            maxR = 200*(max_x)^2 + 5*(max_theta)^2;
+            reinforcementSignal(timeStep) = (200*stateVector(xIndex, timeStep)^2 + 5*stateVector(thetaIndex, timeStep)^2)/maxR;
         end
         
         stateVector(:, timeStep + 1) = CartPolePlant(stateVector(:, timeStep), actions(timeStep));

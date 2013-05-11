@@ -45,6 +45,8 @@ discountRate = 1;
     
 actor = BackpropNeuralNet(numStates, 8, 1);
 critic = BackpropNeuralNet(numStates, 10, numStates);
+actor.initWeightsBetweenMinusPointOneAndPointOne();
+critic.initWeightsBetweenMinusPointOneAndPointOne();
 % actor.setHiddenTransferFunction(Logistic);
 % critic.setHiddenTransferFunction(Logistic);
 cartPole = CartPoleGUI(0, 0);

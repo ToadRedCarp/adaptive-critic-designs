@@ -52,8 +52,8 @@ classdef BackpropNeuralNet < handle
            %initialize weights and biases
            obj.bias{1}        = 1;
            obj.bias{2}        = 1;
-           obj.weights{1}     = (2*rand(numHiddenNodes, numInputNodes + 1) - 1)/10;
-           obj.weights{2}     = (2*rand(numOutputNodes, numHiddenNodes + 1) - 1)/10;
+           obj.weights{1}     = rand(numHiddenNodes, numInputNodes + 1);
+           obj.weights{2}     = rand(numOutputNodes, numHiddenNodes + 1);
            obj.prevWeights{1} = zeros(numHiddenNodes, numInputNodes + 1);
            obj.prevWeights{2} = zeros(numOutputNodes, numHiddenNodes + 1);
            
@@ -73,6 +73,11 @@ classdef BackpropNeuralNet < handle
                 obj.momentum = 1;
             end
         end
+        
+        function initWeightsBetweenMinusPointOneAndPointOne(obj)
+           obj.weights{1}     = (2*rand(obj.numHiddenNodes, obj.numInputNodes + 1) - 1)/10;
+           obj.weights{2}     = (2*rand(obj.numOutputNodes, obj.numHiddenNodes + 1) - 1)/10;
+        end            
         
         function turnOnNormalizationAtHiddenLayer(obj)
             obj.normalizeAtHiddenLayer = 1;
